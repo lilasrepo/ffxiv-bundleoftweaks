@@ -1,13 +1,9 @@
 framework:
+    - make it so one bad sig doesn't prevent all sigged tweaks from loading
     - migrate config name to something agnostic
-existing tweaks:
-    - migrate taskmanager stuff to use the async system
-    - write up GTA requirements
-    - relay helper: minion support, prevent double relaying
-new tweaks:
-    - leve turn in helper
-    - Some sort of go to npc command that incorporates itemvendorlocation/lifestream/navmesh
-    - /tplast command to teleport to the last linked loc
+relay helper: minion support, prevent double relaying
+Some sort of go to npc command that incorporates itemvendorlocation/lifestream/navmesh
+/tplast command to teleport to the last linked loc
 
 date with destiny adjustments
     - zone whitelist/blacklist
@@ -15,4 +11,5 @@ date with destiny adjustments
     - support for the achievements
     - fate whitelist/blacklist
 
-g2a/achievement tracker: move to their own plugins?
+address book: move to lifestream
+g2a/achievement tracker: move to their own plugins
