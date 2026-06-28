@@ -1,0 +1,11 @@
+# Path-level walk-back pins for ffxiv-bundleoftweaks (InternalName: Automaton) — see plugin_update SKILL.md.
+# Pinned 2026-06-24 (Layer 3 / frozen-version guard): Automaton.csproj carries the TC-managed
+# <Version>69.75.0.0</Version> (operator-injected in commit bd49d09b — upstream ships <Version>0.0). The
+# whole submodule is walk-back pinned at the already-optimal pre-API13 anchor (1413027 == 251b6ac^), so
+# /plugin_update normally reports already-optimal and never runs the refresh that could reset this. This
+# pin is future-proofing: IF the anchor is ever advanced, csproj take-theirs would otherwise overwrite
+# 69.75.0.0 with upstream's 0.0 placeholder and break the lineage. Pinning the csproj take-ours makes the
+# TC version stick; the Layer-2 auto-bump increments it (69.75.0.0 -> 69.75.0.1) if a future advance ships
+# changed content at the same version. See FORWARD_PORT_REFERENCE.md (fix the stale "Automaton v0.0.0.0"
+# entry) + memory project_lilasrepo_version_pins.
+Automaton/Automaton.csproj

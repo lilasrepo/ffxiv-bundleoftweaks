@@ -1,1 +1,14 @@
-<Project Sdk="Dalamud.NET.Sdk/10.0.0" />
+<Project Sdk="Microsoft.NET.Sdk" />
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Platforms>x64</Platforms>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <LangVersion>preview</LangVersion>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DalamudLibPath>$(MSBuildThisFileDirectory)..\..\..\TC_ok\_dalamud_api12\</DalamudLibPath>
+  </PropertyGroup>
+
