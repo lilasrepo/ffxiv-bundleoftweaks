@@ -88,15 +88,15 @@ internal class FateTrackerUI(DateWithDestiny tweak) : Window($"Fate Tracker##{na
     {
         return Player.Territory switch
         {
-            1237 => WKSManager.Instance()->MechaEventModule->Events.ToArray().Select(x => new FateWrapper()
+            1237 => [.. WKSManager.Instance()->MechaEventModule->Events.ToArray().Select(x => new FateWrapper()
             {
                 FateType = FateType.MechaEvent,
                 Id = x.WKSMechaEventDataRowId,
                 Progress = x.EventProgress,
                 StartTime = x.EventStartTimestamp,
                 Duration = x.EventEndTimestamp - x.EventStartTimestamp,
-            }).ToList(),
-            1252 => DynamicEventContainer.GetInstance()->Events.ToArray().Select(x => new FateWrapper()
+            })],
+            1252 => [.. DynamicEventContainer.GetInstance()->Events.ToArray().Select(x => new FateWrapper()
             {
                 FateType = FateType.DynamicEvent,
                 Id = x.DynamicEventId,
@@ -104,8 +104,8 @@ internal class FateTrackerUI(DateWithDestiny tweak) : Window($"Fate Tracker##{na
                 Duration = (int)x.SecondsDuration,
                 TimeLeft = x.SecondsLeft,
                 Progress = x.Progress,
-            }).ToList(),
-            _ => Svc.Fates.OrderBy(x => Vector3.Distance(Player.Position, x.Position))
+            })],
+            _ => [.. Svc.Fates.OrderBy(x => Vector3.Distance(Player.Position, x.Position))
                 .Select(x => new FateWrapper()
                 {
                     FateType = FateType.Normal,
@@ -115,7 +115,7 @@ internal class FateTrackerUI(DateWithDestiny tweak) : Window($"Fate Tracker##{na
                     Duration = x.Duration,
                     TimeLeft = x.TimeRemaining,
                     Progress = x.Progress
-                }).ToList(),
+                })],
         };
     }
 

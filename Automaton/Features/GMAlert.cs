@@ -111,8 +111,8 @@ public class GMAlert : Tweak<GMAlertConfiguration>
 
         if (Config.Commands.Count > 0)
             foreach (var cmd in Config.Commands)
-                Chat.Instance.ExecuteCommand(cmd);
+                Chat.ExecuteCommand(cmd);
         if (Config.KillGame)
-            Chat.Instance.ExecuteCommand("/xlkill");
+            Chat.ExecuteCommand("/xlkill");
     }
 }

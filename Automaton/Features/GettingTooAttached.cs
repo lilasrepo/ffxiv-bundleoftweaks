@@ -1,12 +1,10 @@
-using Dalamud.Game.Text.SeStringHandling;
+﻿using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Memory;
 using ECommons;
-using ECommons.Automation;
 using ECommons.UIHelpers.AddonMasterImplementations;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Dalamud.Bindings.ImGui;
 using Lumina.Excel.Sheets;
-using Callback = ECommons.Automation.Callback;
 
 namespace Automaton.Features;
 

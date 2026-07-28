@@ -1,12 +1,10 @@
-﻿using ECommons.Automation;
-using ECommons.ImGuiMethods;
+﻿using ECommons.ImGuiMethods;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Dalamud.Bindings.ImGui;
 using Lumina.Excel.Sheets;
-using Callback = ECommons.Automation.Callback;
 
 namespace Automaton.UI.Debug.Tabs;
 internal unsafe class ToolsTab : DebugTab
@@ -54,7 +52,7 @@ internal unsafe class ToolsTab : DebugTab
         if (ImGui.Button("hg"))
         {
             var player = (FFXIVClientStructs.FFXIV.Client.Game.Character.Character*)GameObjectManager.Instance()->Objects.IndexSorted[0].Value;
-            player->GetStatusManager()->SetStatus(20, 149, 5.0f, 0, 0xE0000000, true);
+            player->GetStatusManager()->SetStatus(20, 149, 5.0f, 0, (ulong)0xE0000000, true);
         }
     }
 }

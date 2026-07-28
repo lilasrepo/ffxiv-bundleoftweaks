@@ -30,7 +30,10 @@ internal unsafe class KeybindsTab : DebugTab
             var keyName = Utf8String.FromString(row.Label.ToString());
             var inputData = UIInputData.Instance();
             inputData->GetKeybindByName(keyName, &keybind);
-            List<List<nint>?> availableKeys = [Utils.GetKeysToPress(keybind.KeySettings[0].Key, keybind.KeySettings[0].KeyModifier), Utils.GetKeysToPress(keybind.KeySettings[1].Key, keybind.KeySettings[1].KeyModifier)];
+            // B1(api13): Utils.GetKeysToPress is commented out in this tree -- the TC game-struct
+            // shape it needs differs, and upstream's caller passes a different argument shape
+            // (KeySettings[i].Key/KeyModifier) than the disabled helper took. Debug tab only.
+            List<List<nint>?> availableKeys = [null, null];
             var realKeys = availableKeys.Where(x => x != null).Select(x => x!).MinBy(x => x.Count);
 
             ImGui.TableNextColumn();

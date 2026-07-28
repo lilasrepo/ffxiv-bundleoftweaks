@@ -1,13 +1,12 @@
-using Automaton.Features;
+﻿using Automaton.Features;
 using ECommons.Configuration;
 using System.Collections.ObjectModel;
-using System.Text;
 using System.Text.Json.Serialization;
 using YamlDotNet.Serialization;
 
 namespace Automaton.Configuration;
 
-public class Config : IEzConfig
+public class Config
 {
     [JsonIgnore]
     public const int CURRENT_CONFIG_VERSION = 4;
@@ -22,7 +21,6 @@ public class TweakConfigs
 {
     public AchievementTrackerConfiguration AchievementTrackerConfiguration { get; init; } = new();
     public AddresBookDebugConfiguration AddresBookDebug { get; init; } = new();
-    public ARTurnInConfiguration ARTurnIn { get; init; } = new();
     public AutoFollowConfiguration AutoFollow { get; init; } = new();
     public AutoInviteConfiguration AutoInvite { get; init; } = new();
     public ClickToMoveConfiguration ClickToMove { get; init; } = new();
@@ -32,35 +30,18 @@ public class TweakConfigs
     public EnhancedDutyStartEndConfiguration EnhancedDutyStartEnd { get; init; } = new();
     public EnhancedLoginLogoutConfig EnhancedLoginLogout { get; init; } = new();
     public GettingTooAttachedConfiguration GettingTooAttached { get; init; } = new();
+    public GlamourSetsTrackerConfiguration GlamourSets { get; init; } = new();
     public GMAlertConfiguration GMAlert { get; init; } = new();
     public HuntRelayHelperConfiguration HuntRelayHelper { get; init; } = new();
     public SimpleCurrencyAlertConfig SimpleCurrencyAlertConfig { get; init; } = new();
     public ARQuestingConfiguration ARQuestingConfiguration { get; init; } = new();
 }
 
-public class YamlFactory : ISerializationFactory
+public class YamlFactory : DefaultSerializationFactory, ISerializationFactory
 {
-    public string DefaultConfigFileName => $"ezAutomaton.yaml";
-
-    public bool IsBinary => false;
-
-    public T Deserialize<T>(string inputData) => new DeserializerBuilder().IgnoreUnmatchedProperties().Build().Deserialize<T>(inputData);
-    public T? Deserialize<T>(byte[] inputData) => Deserialize<T>(Encoding.UTF8.GetString(inputData));
-    public string Serialize(object s, bool prettyPrint) => new SerializerBuilder().Build().Serialize(s);
-    public string? Serialize(object config) => Serialize(config, false);
-    public byte[]? SerializeAsBin(object config) => Encoding.UTF8.GetBytes(Serialize(config) ?? "");
-
-    // porting-note(api13): ECommons' ISerializationFactory grew five file-IO members after
-    // the revision upstream Automaton pins, so YamlFactory no longer satisfies it. Delegate
-    // to DefaultSerializationFactory rather than reimplementing -- its WriteFile carries the
-    // write-to-.new-then-move anti-corruption dance that a plain File.WriteAllText loses.
-    private static readonly DefaultSerializationFactory FileIo = new();
-
-    public void WriteFile(string fullPath, string data) => FileIo.WriteFile(fullPath, data);
-    public void WriteFile(string fullPath, byte[] data) => FileIo.WriteFile(fullPath, data);
-    public string ReadFileAsText(string fullPath) => FileIo.ReadFileAsText(fullPath);
-    public byte[] ReadFileAsBin(string fullPath) => FileIo.ReadFileAsBin(fullPath);
-    public bool FileExists(string fullPath) => FileIo.FileExists(fullPath);
+    public new string DefaultConfigFileName => $"ezAutomaton.yaml";
+    public new T Deserialize<T>(string inputData) => new DeserializerBuilder().IgnoreUnmatchedProperties().Build().Deserialize<T>(inputData);
+    public new string Serialize(object s, bool prettyPrint) => new SerializerBuilder().Build().Serialize(s);
 }
 
 public interface IMigration

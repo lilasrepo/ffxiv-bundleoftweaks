@@ -19,46 +19,27 @@ public unsafe class Memory
 {
     public static class Signatures
     {
-        internal const string AgentReturnReceiveEvent = "E8 ?? ?? ?? ?? 41 8D 5E 0D";
-        internal const string AbandonDuty = "E8 ?? ?? ?? ?? 48 8B 43 28 41 B2 01";
+        internal const string AgentReturnReceiveEvent = "E8 ?? ?? ?? ?? 66 0F 1F 84 ?? 00 00 00 00 48 83 EF";
         internal const string BewitchProc = "40 53 48 83 EC 50 45 33 C0";
-        internal const string EnqueueSnipeTask = "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 50 48 8B F1 48 8D 4C 24 ?? E8 ?? ?? ?? ?? 48 8B 4C 24 ??"; // xan
-        internal const string FollowQuestRecast = "E8 ?? ?? ?? ?? 48 8B 9C 24 ?? ?? ?? ?? 0F 28 74 24 ?? 0F 28 7C 24 ?? 44 0F 28 44 24 ?? 48 81 C4"; // atmo
+        internal const string EnqueueSnipeTask = "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 50 48 8B F9 48 8D 4C 24 ??"; // xan
+        internal const string FollowQuestRecast = "F3 0F 11 7C 24 ?? E8 ?? ?? ?? ?? 48 8B 9C 24 ?? ?? ?? ??"; // atmo
         internal const string ExecuteCommand = "E8 ?? ?? ?? ?? 8D 46 0A"; // st
-        internal const string ExecuteCommandComplexLocation = "E8 ?? ?? ?? ?? EB 3D 8B 93 ?? ?? ?? ??";
+        internal const string ExecuteCommandComplexLocation = "E8 ?? ?? ?? ?? 48 8B 7B 08 45 33 C0";
         internal const string KnockbackProc = "E8 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? FF C6";
         internal const string MoveController = "E8 ?? ?? ?? ?? 48 85 C0 74 AE 83 FD 05";
-        internal const string MoveItem = "48 89 5C 24 ?? 55 56 57 41 55 41 56 48 8B EC 48 83 EC 40"; // st
-        internal const string PacketDispatcher_OnReceivePacketHookSig = "40 53 56 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 ?? 8B F2"; // hyperborea
-        internal const string PacketDispatcher_OnSendPacketHook = "48 89 5C 24 ?? 48 89 74 24 ?? 4C 89 64 24 ?? 55 41 56 41 57 48 8B EC 48 83 EC 70"; // hyperborea
-        internal const string PlayerController = "48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 3C 01 75 1E 48 8D 0D"; // bossmod
-        internal const string PlayerGroundSpeed = "F3 0F 59 05 ?? ?? ?? ?? F3 0F 59 05 ?? ?? ?? ?? F3 0F 58 05 ?? ?? ?? ?? 44 0F 28 C8";
+        internal const string MoveItem = "48 89 5C 24 ?? 48 89 74 24 ?? 48 89 7C 24 ?? 55 41 56 41 57 48 8B EC 48 83 EC 40 4C 8B F1"; // st
+        internal const string PlayerController = "48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 0F 28 F0 45 0F 57 C0"; // bossmod (Client::Game::Control::InputManager)
+        // If this changes again, since this involves relative offsets, if the instruction bytes change count (e.g. F3 0F 59 05 ?? ... = 4 to F3 44 0F 59 0D ?? ... = 5)
+        // update the address math: `address = address + <instruction_byte_count> + Marshal.ReadInt32(address + 4) + 4;`
+        // or try and find a sig with the same count (ghidra seems better lately over IDA for getting identical sigs?)
+        internal const string PlayerGroundSpeed = "F3 0F 11 05 ?? ?? ?? ?? 40 38 2D";
         internal const string ReceiveAchievementProgress = "C7 81 ?? ?? ?? ?? ?? ?? ?? ?? 89 91 ?? ?? ?? ?? 44 89 81"; // cs
         internal const string RidePillion = "48 85 C9 0F 84 ?? ?? ?? ?? 48 89 6C 24 ?? 56 48 83 EC";
-        // C-fix(7.3): was "E8 ?? ?? ?? ?? EB 5A 48 8B 07" (// veyn), which does not resolve on TC game v7.20
-        // (runtime-observed 2026-07-28). This is AgentSalvage::SalvageItem, which FFXIVClientStructs itself
-        // carries as a [MemberFunction] -- TC_ok's vendored CS has Automaton's exact old string on that very
-        // method -- so the value below is read straight out of CS 6966's metadata (Cecil), i.e. from the
-        // 7.3-generated set that ships in TC_ok/_dalamud_api13. Delegates.SalvageItem there is
-        // Void(AgentSalvage*, InventoryItem*, Int32, Byte), matching SalvageItemDelegate below exactly.
-        internal const string SalvageItem = "E8 ?? ?? ?? ?? 48 8D 96 ?? ?? ?? ?? E9";
-        internal const string WorldTravel = "40 55 53 56 57 41 54 41 56 41 57 48 8D AC 24 ?? ?? ?? ?? B8";
-        // C-fix(7.3): was "48 8B CB E8 ?? ?? ?? ?? 48 8D 8B ?? ?? ?? ?? E8 ?? ?? ?? ?? 4C 8B 05 ?? ?? ?? ??",
-        // which does not resolve on TC game v7.20 (runtime-observed 2026-07-28, and it was masked until the
-        // SalvageItem fix let the field-initializer chain get this far). This is
-        // AgentWorldTravel::SetupWorldTravelInfo -- FFXIVClientStructs 6966 names it with exactly this
-        // parameter list, Void(AgentWorldTravel*, UInt16, UInt16) vs the delegate's (worldTravel,
-        // currentWorld, targetWorld) below -- so the value is read out of CS 6966's [MemberFunction]
-        // metadata (Cecil), i.e. from the 7.3-generated set in TC_ok/_dalamud_api13.
-        // Two notes on the old value, neither of which we need to preserve: it began with 48, not E8, so
-        // Dalamud's ScanText returned the address of the `mov rcx, rbx` rather than a function entry; and
-        // WorldTravelSetupInfoDelegate declares an nint return where the real function returns void. Both
-        // are harmless because nothing in the plugin calls Memory.WorldTravelSetupInfo -- left as upstream
-        // wrote them so this stays a one-line signature correction.
-        internal const string WorldTravelSetupInfo = "48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC ?? 48 8B F9 41 0F B7 F0 48 8B 49";
         internal const string FreeCompanyDialogPacketReceive = "48 89 5C 24 ?? 48 89 74 24 ?? 57 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 ?? ?? ?? ?? 0F B6 42 31"; // xan
-        internal const string RetrieveMateria = "E8 ?? ?? ?? ?? EB 27 48 8B 01"; // Client::UI::Agent::AgentMaterialize.ReceiveEvent	call    sub_140B209C0
         internal const string ProcessPacketUpdateClassInfo = "48 89 5C 24 ?? 57 48 83 EC 20 48 8B DA 48 8D 0D ?? ?? ?? ??";
+        internal const string SystemMenuExecution = "E8 ?? ?? ?? ?? 40 B5 ?? 41 B9";
+        internal const string SendLogout = "40 53 48 83 EC 20 48 8B 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B D8 48 85 C0 74 3C 48 8B 0D ?? ?? ?? ??";
+        internal const string HasPermission = "E8 ?? ?? ?? ?? 84 C0 75 ?? 8B FB";
     }
 
     public static class Delegates
@@ -81,26 +62,24 @@ public unsafe class Memory
         internal delegate void SalvageItemDelegate(AgentSalvage* thisPtr, InventoryItem* item, int addonId, byte a4);
         internal delegate nint WorldTravelSetupInfoDelegate(nint worldTravel, ushort currentWorld, ushort targetWorld);
         internal delegate void ProcessPacketUpdateClassInfoDelegate(InfoProxyInterface* ptr, byte* packetData);
+        internal delegate bool SystemMenuExecutionDelegate(AgentHUD* @this, int a2, int a3, int a4, byte* a5);
+        internal delegate nint SendLogoutDelegate();
+        internal delegate bool HasPermissionDelegate(Conditions* @this, uint permissionId, int excludedCondition1 = 0, int excludedCondition2 = 0);
     }
 
-    // B1(api13 / TC game v7.20): these eight were plain EzDelegate.Get calls, which throw when a signature
-    // does not resolve. As FIELD INITIALIZERS that makes one unresolvable signature fatal to Memory..ctor --
-    // and because Memory is an ECommons singleton service, the whole service then fails to construct and
-    // EVERY delegate here becomes unavailable, not just the missing one. Runtime-observed 2026-07-28: on the
-    // TC binary RetrieveMateria does not resolve, which took the entire Memory service down with it, and
-    // because initializers run in order each fix only unmasked the next failure (SalvageItem -> then
-    // WorldTravelSetupInfo -> then RetrieveMateria, one client restart apiece).
-    // Every field is already declared nullable, so upstream's own intent is that a missing delegate is
-    // survivable. TryGet resolves each independently and leaves the unresolvable ones null.
     internal Delegates.RidePillionDelegate? RidePillion = TryGet<Delegates.RidePillionDelegate>(Signatures.RidePillion);
-    internal Delegates.SalvageItemDelegate? SalvageItem = TryGet<Delegates.SalvageItemDelegate>(Signatures.SalvageItem);
-    internal Delegates.AbandonDutyDelegate? AbandonDuty = TryGet<Delegates.AbandonDutyDelegate>(Signatures.AbandonDuty);
-    internal Delegates.AgentWorldTravelReceiveEventDelegate? WorldTravel = TryGet<Delegates.AgentWorldTravelReceiveEventDelegate>(Signatures.WorldTravel);
-    internal Delegates.WorldTravelSetupInfoDelegate? WorldTravelSetupInfo = TryGet<Delegates.WorldTravelSetupInfoDelegate>(Signatures.WorldTravelSetupInfo);
-    internal Delegates.RetrieveMateriaDelegate? RetrieveMateria = TryGet<Delegates.RetrieveMateriaDelegate>(Signatures.RetrieveMateria);
     internal Delegates.ExecuteCommandDelegate? ExecuteCommand = TryGet<Delegates.ExecuteCommandDelegate>(Signatures.ExecuteCommand);
     internal Delegates.MoveItem? MoveItem = TryGet<Delegates.MoveItem>(Signatures.MoveItem);
+    internal Delegates.SendLogoutDelegate? SendLogout = TryGet<Delegates.SendLogoutDelegate>(Signatures.SendLogout);
+    internal Delegates.HasPermissionDelegate? HasPermission = TryGet<Delegates.HasPermissionDelegate>(Signatures.HasPermission);
 
+    // MUST RE-APPLY after every refresh (lost once already, in the 9f3c68b anchor advance).
+    // EzDelegate.Get throws when a signature does not resolve. As FIELD INITIALIZERS that makes one
+    // unresolvable signature fatal to Memory..ctor -- and because Memory is an ECommons singleton
+    // service, the whole service then fails to construct and EVERY delegate here becomes
+    // unavailable, not just the missing one. Initializers also run in order, so each fix only
+    // unmasks the next, one client restart apiece. Every field is declared nullable, so upstream's
+    // own intent is that a missing delegate is survivable.
     private static T? TryGet<T>(string sig) where T : class
     {
         try
@@ -232,17 +211,22 @@ public unsafe class Memory
         private readonly ExecuteCommands ExecuteCommands = new();
         private byte ReturnDetour(AgentInterface* agent)
         {
+            Svc.Log.Info("return called");
             if (ActionManager.Instance()->GetActionStatus(ActionType.GeneralAction, 6) != 0 || Player.IsInPvP)
+            {
+                Svc.Log.Info("return blocked");
                 return ReturnHook.Original(agent);
+            }
 
             if (Svc.Party.Length > 1)
             {
                 if (Svc.Party[0]?.Name == Svc.ClientState.LocalPlayer?.Name)
-                    Chat.Instance.SendMessage("/partycmd breakup");
+                    Chat.SendMessage("/partycmd breakup");
                 else
-                    Chat.Instance.SendMessage("/leave");
+                    Chat.SendMessage("/leave");
             }
 
+            Svc.Log.Info("returning");
             ExecuteCommands.ExecuteCommand(ExecuteCommandFlag.InstantReturn);
             return 1;
         }

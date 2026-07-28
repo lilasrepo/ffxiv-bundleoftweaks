@@ -45,11 +45,11 @@ public class DateWithDestinyConfiguration
 }
 
 [Tweak]
+[Requires(Ipc.Navmesh)]
 public class DateWithDestiny : Tweak<DateWithDestinyConfiguration>
 {
     public override string Name => "Date with Destiny";
     public override string Description => "Fate tracker and mover. Doesn't handle combat.";
-    public override BaseIPC[] Requirements => [Service.Navmesh];
 
     public bool active = false;
     private static Vector3 TargetPos;
@@ -258,7 +258,7 @@ public class DateWithDestiny : Tweak<DateWithDestinyConfiguration>
                         var minion = Yokai.FirstOrDefault(x => CompanionUnlocked(x.Minion) && GetItemCount(x.Medal) < 10 && GetItemCount(x.Weapon) < 1).Minion;
                         if (Config.SwapMinions && minion != default)
                         {
-                            ECommons.Automation.Chat.Instance.SendMessage($"/minion {GetRow<Companion>(minion)?.Singular}");
+                            ECommons.Automation.Chat.SendMessage($"/minion {GetRow<Companion>(minion)?.Singular}");
                             return;
                         }
                     }
@@ -348,7 +348,7 @@ public class DateWithDestiny : Tweak<DateWithDestinyConfiguration>
         && x.SubKind == (byte)BattleNpcSubKind.Enemy
         && x.Struct() != null && x.Struct()->FateId == FateID && Math.Sqrt(Math.Pow(x.Position.X - CurrentFate->Location.X, 2) + Math.Pow(x.Position.Z - CurrentFate->Location.Z, 2)) < CurrentFate->Radius)
         // Prioritize Forlorns if configured
-        .OrderByDescending(x => Config.PrioritizeForlorns && ForlornIDs.Contains(x.DataId))
+        .OrderByDescending(x => Config.PrioritizeForlorns && ForlornIDs.Contains(x.BaseId))
         // Prioritize enemies targeting us
         .ThenByDescending(x => x.IsTargetingPlayer())
         // Deprioritize mobs in combat with other players (hopefully avoid botlike pingpong behavior in trash fates)
@@ -388,7 +388,7 @@ public class DateWithDestiny : Tweak<DateWithDestinyConfiguration>
         if (value != 0 && !PlayerState.Instance()->IsLevelSynced)
         {
             if (Player.Level > fateMaxLevel)
-                ECommons.Automation.Chat.Instance.SendMessage("/lsync");
+                ECommons.Automation.Chat.SendMessage("/lsync");
         }
     }
 }

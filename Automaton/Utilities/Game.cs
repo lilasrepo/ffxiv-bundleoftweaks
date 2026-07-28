@@ -122,7 +122,7 @@ public unsafe class Game
 
     public static bool OpenShop(ulong vendorInstanceId, uint shopId)
     {
-        if (Svc.Objects.TryGetFirst(o => o.DataId == vendorInstanceId, out var vendor))
+        if (Svc.Objects.TryGetFirst(o => o.BaseId == vendorInstanceId, out var vendor))
             return OpenShop(vendor.Struct(), shopId);
         else
         {
@@ -292,7 +292,10 @@ public unsafe class Game
         var obj = GameObjectManager.Instance()->Objects.GetObjectByGameObjectId(gameobjectId);
         if (obj == null)
             return false;
-        TargetSystem.Instance()->InteractWithObject(obj, false);
+        if (obj->ObjectKind is ObjectKind.EventObj)
+            TargetSystem.Instance()->OpenObjectInteraction(obj);
+        else
+            TargetSystem.Instance()->InteractWithObject(obj, false);
         return true;
     }
 
@@ -369,4 +372,8 @@ public unsafe class Game
         var info = Player.Character->GetCastInfo();
         return info is not null && info->IsCasting && info->ActionType == ActionType.Action && info->ActionId == 5;
     }
+
+    public static bool IsAdventureComplete(uint rowId) => PlayerState.Instance()->IsAdventureComplete(rowId);
+
+    public static bool InInteractRange(DGameObject obj) => EventFramework.Instance()->CheckInteractRange((GameObject*)Control.GetLocalPlayer(), (GameObject*)obj.Address, 1, false);
 }

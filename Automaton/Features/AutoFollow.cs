@@ -10,7 +10,7 @@ namespace Automaton.Features;
 
 public class AutoFollowConfiguration
 {
-    [EnumConfig] public MovementType MovementType;
+    //[EnumConfig] public MovementType MovementType;
 
     [IntConfig(DefaultValue = 3)] public int DistanceToKeep = 3;
     [IntConfig] public int DisableIfFurtherThan;
@@ -30,19 +30,24 @@ public unsafe class AutoFollow : Tweak<AutoFollowConfiguration>
         "You can also add a number argument to specify the distance to keep, or add the off argument to clear the current master.";
 
     private readonly OverrideMovement movement = new();
-    private DGameObject? master;
-    private uint? masterObjectID;
+    private uint? _masterId;
+    private string? _masterName;
 
     [CommandHandler("/autofollow", "Enable AutoFollow")]
     internal void OnCommand(string command, string arguments)
     {
         if (!arguments.IsNullOrEmpty())
         {
-            var obj = Svc.Objects.FirstOrDefault(o => o.Name.TextValue.ToLowerInvariant().Contains(arguments, StringComparison.InvariantCultureIgnoreCase));
-            if (obj != null)
+            if (Svc.Objects.FirstOrDefault(o => o.Name.TextValue.ToLowerInvariant().Contains(arguments, StringComparison.InvariantCultureIgnoreCase)) is { } obj)
             {
-                master = obj;
-                masterObjectID = obj.EntityId;
+                _masterId = obj.EntityId;
+                _masterName = obj.Name.TextValue;
+                Svc.Toasts.ShowNormal($"Auto following {obj.Name}");
+                return;
+            }
+            else
+            {
+                _masterName = arguments;
                 return;
             }
         }
@@ -68,23 +73,37 @@ public unsafe class AutoFollow : Tweak<AutoFollowConfiguration>
     {
         try
         {
-            master = Svc.Targets.Target;
-            masterObjectID = Svc.Targets.Target?.EntityId;
+            if (Svc.Targets.Target is { } target)
+            {
+                _masterId = target.EntityId;
+                _masterName = target.Name.TextValue;
+                Svc.Toasts.ShowNormal($"Auto following {Svc.Targets.Target.Name}");
+            }
+            else
+            {
+                _masterId = null;
+                Svc.Toasts.ShowNormal("Auto following off");
+            }
         }
         catch { return; }
     }
 
     private void ClearMaster()
     {
-        master = null;
-        masterObjectID = null;
+        _masterId = null;
+        _masterName = null;
+        movement.Enabled = false;
+        Svc.Toasts.ShowNormal("Auto following off");
     }
 
     private void Follow(IFramework framework)
     {
-        if (master == null || !Player.Available || TaskManager.IsBusy) return;
+        if (!Player.Available || TaskManager.IsBusy) return;
+        if (_masterId == null && Config.AutoFollowName.IsNullOrEmpty() && string.IsNullOrEmpty(_masterName)) return; // always try to follow if temp or permanent name is set
 
-        master = Svc.Objects.FirstOrDefault(x => x.EntityId == masterObjectID || !Config.AutoFollowName.IsNullOrEmpty() && x.Name.TextValue.Equals(Config.AutoFollowName, StringComparison.InvariantCultureIgnoreCase));
+        var master = Svc.Objects.FirstOrDefault(x => x.EntityId == _masterId
+            || (!Config.AutoFollowName.IsNullOrEmpty() && x.Name.TextValue.Equals(Config.AutoFollowName, StringComparison.InvariantCultureIgnoreCase))
+            || (!string.IsNullOrEmpty(_masterName) && x.Name.TextValue.Equals(_masterName, StringComparison.InvariantCultureIgnoreCase)));
 
         if (master == null) { movement.Enabled = false; return; }
         if (Config.DisableIfFurtherThan > 0 && Player.DistanceTo(master) >= Config.DisableIfFurtherThan) { movement.Enabled = false; return; }
@@ -120,7 +139,6 @@ public unsafe class AutoFollow : Tweak<AutoFollowConfiguration>
             //    }
             //}
 
-            // Mount:
             // mount
             if (master.Character()->IsMounted() && CanMount())
             {

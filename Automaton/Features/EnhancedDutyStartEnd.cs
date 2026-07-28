@@ -3,6 +3,7 @@ using Dalamud.Interface.Components;
 using ECommons;
 using ECommons.ImGuiMethods;
 using Dalamud.Bindings.ImGui;
+using FFXIVClientStructs.FFXIV.Client.Game.Event;
 
 namespace Automaton.Features;
 
@@ -97,7 +98,7 @@ public class EnhancedDutyStartEnd : Tweak<EnhancedDutyStartEndConfiguration>
         var allPlayersInParty = Config.Players.Count > 0 && Config.Players.IsSubsetOf(Svc.Party.Select(p => p.Name.TextValue));
         var noPlayersInParty = Config.Players.Count > 0 && !Config.Players.Any(p => Svc.Party.Any(pm => pm.Name.TextValue == p));
         if (Config.CheckForAll && !allPlayersInParty || Config.CheckForAny && noPlayersInParty)
-            Service.Memory.AbandonDuty?.Invoke(false);
+            EventFramework.LeaveCurrentContent(true);
     }
 
     private static uint _territoryID;
@@ -115,7 +116,7 @@ public class EnhancedDutyStartEnd : Tweak<EnhancedDutyStartEndConfiguration>
         if (Config.AutoLeaveOnEnd)
         {
             TaskManager.EnqueueDelay(Config.TimeToWait.Ms());
-            TaskManager.Enqueue(() => Service.Memory.AbandonDuty?.Invoke(false));
+            TaskManager.Enqueue(() => EventFramework.LeaveCurrentContent(true));
         }
     }
 

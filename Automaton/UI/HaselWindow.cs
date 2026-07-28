@@ -1,7 +1,7 @@
+﻿using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using ECommons.ImGuiMethods;
-using Dalamud.Bindings.ImGui;
 using System.Drawing;
 using System.Reflection;
 
@@ -167,7 +167,7 @@ public partial class HaselWindow : Window
 
         ImGui.SameLine(windowX - textSize.X);
 
-        ImGuiEx.Text((uint)color, status);
+        ImGuiEx.Text(color.Vector4, status);
 
         if (tweak.DisabledReason is { } reason)
         {
@@ -188,7 +188,7 @@ public partial class HaselWindow : Window
             ImGuiX.DrawSection("Required Dependencies");
             ImGuiX.Icon(60074, 24);
             ImGui.SameLine();
-            ImGui.TextColoredWrapped(Colors.Grey2, $"Missing {tweak.Requirements.Count(r => !r.IsLoaded)} of the required plugins for this feature to work:");
+            ImGuiEx.TextV(Colors.Grey2, $"Missing {tweak.Requirements.Count(r => !r.IsLoaded)} of the required plugins for this feature to work:");
             foreach (var entry in tweak.Requirements.Where(r => !r.IsLoaded))
             {
                 ImGui.TextColoredWrapped(Colors.Grey2, $"{entry.Name}:");

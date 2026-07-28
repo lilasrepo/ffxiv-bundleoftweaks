@@ -5,8 +5,8 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 using System.Collections.Generic;
 using System.Linq;
-using Callback = ECommons.Automation.Callback;
 using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
+using Callback = ECommons.Automation.Callback;
 
 namespace ECommons.UIHelpers.AddonMasterImplementations;
 

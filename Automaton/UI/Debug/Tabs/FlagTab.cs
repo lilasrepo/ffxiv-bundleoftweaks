@@ -7,11 +7,11 @@ internal unsafe class FlagTab : DebugTab
 {
     public override void Draw()
     {
-        ImGui.TextUnformatted($"IsFlagMarkerSet: {(AgentMap.Instance()->FlagMarkerCount > 0)}");
+        ImGui.TextUnformatted($"IsFlagMarkerSet: {AgentMap.Instance()->FlagMarkerCount > 0}");
         if (!(AgentMap.Instance()->FlagMarkerCount > 0)) return;
 
         ImGui.TextUnformatted($"Territory: {PlayerEx.MapFlag.TerritoryId} {GetRow<TerritoryType>(PlayerEx.MapFlag.TerritoryId)!.Value.Name}");
-        var row = GetRow<Lumina.Excel.Sheets.Map>(PlayerEx.MapFlag.MapId);
+        var row = GetRow<Sheets.Map>(PlayerEx.MapFlag.MapId);
         if (row is { } map)
             ImGui.TextUnformatted($"[{map.RowId}] Size: {map.SizeFactor}, Offset: {map.OffsetX}, {map.OffsetY} Territory: {map.TerritoryType.Value.Name}");
 

@@ -1,8 +1,8 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System.Collections.Generic;
-using Callback = ECommons.Automation.Callback;
 using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
+using Callback = ECommons.Automation.Callback;
 
 namespace ECommons.UIHelpers.AddonMasterImplementations;
 

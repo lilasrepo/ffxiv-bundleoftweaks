@@ -19,9 +19,17 @@ public sealed class KillFlag(string world) : CommonTasks
         if (!world.IsNullOrEmpty())
             await HandleWorldTravel();
 
-        var flagWorldPos = Coords.FlagToWorld(PlayerEx.MapFlag);
-        await TeleportTo(PlayerEx.MapFlag.TerritoryId, flagWorldPos);
-        await MoveTo(PlayerEx.MapFlag, new MovementConfig { Mount = true, Fly = PlayerEx.MapFlag.TerritoryId != 180 }, true);
+        await TeleportTo(PlayerEx.MapFlag.TerritoryId, PlayerEx.MapFlag.ToVector3());
+        await MoveTo(
+            PlayerEx.MapFlag.ToVector3(),
+            MovementConfig.Default.WithOptions(MovementOptions.Mount | (PlayerEx.MapFlag.TerritoryId != 180 ? MovementOptions.Fly : MovementOptions.None)),
+            stopCondition: () => FindHuntTarget() is not null,
+            onStopReached: async () =>
+            {
+                if (FindHuntTarget() is DGameObject target)
+                    await MoveTo(target.Position, MovementConfig.Default);
+            }
+        );
         using var stop = new OnDispose(() => Service.BossMod.ClearActive());
         await Kill();
     }
@@ -57,7 +65,7 @@ public sealed class KillFlag(string world) : CommonTasks
 
     private IGameObject? FindHuntTarget() => Svc.Objects
         .Where(o => Player.DistanceTo(o) < HUNT_DETECTION_RADIUS && o is IBattleNpc { NameId: > 0 })
-        .Select(o => new { Object = o, Row = FindRow<NotoriousMonster>(x => o.DataId == x.BNpcBase.RowId) })
+        .Select(o => new { Object = o, Row = FindRow<NotoriousMonster>(x => o.BaseId == x.BNpcBase.RowId) })
         .Where(x => x.Row.HasValue)
         .OrderByDescending(x => x.Row?.Rank)
         .Select(x => x.Object)

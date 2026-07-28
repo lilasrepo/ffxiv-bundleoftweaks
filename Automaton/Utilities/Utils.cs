@@ -1,13 +1,8 @@
-using Dalamud.Game.ClientState.Keys;
+﻿using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Textures.TextureWraps;
 using ECommons.Reflection;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
-using FFXIVClientStructs.FFXIV.Client.System.String;
-using FFXIVClientStructs.FFXIV.Client.UI;
-using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using FFXIVClientStructs.Interop;
-using Dalamud.Bindings.ImGui;
 
 namespace Automaton.Utilities;
 public static class Utils
@@ -50,71 +45,48 @@ public static class Utils
         return new(center.X + distance * (float)Math.Cos(angle), center.Y, center.Z + distance * (float)Math.Sin(angle));
     }
 
-    public static unsafe Structs.AgentMJICraftSchedule* Agent = (Structs.AgentMJICraftSchedule*)AgentModule.Instance()->GetAgentByInternalId(AgentId.MJICraftSchedule);
-    public static unsafe Structs.AgentMJICraftSchedule.AgentData* AgentData => Agent != null ? Agent->Data : null;
-    public static unsafe void SetRestCycles(uint mask)
-    {
-        Svc.Log.Debug($"Setting rest: {mask:X}");
-        AgentData->NewRestCycles = mask;
-        SynthesizeEvent(5, [new() { Type = AtkValueType.Int, Int = 0 }]);
-    }
-    private static unsafe void SynthesizeEvent(ulong eventKind, Span<AtkValue> args)
-    {
-        var eventData = stackalloc int[] { 0, 0, 0 };
-        Agent->AgentInterface.ReceiveEvent((AtkValue*)eventData, args.GetPointer(0), (uint)args.Length, eventKind);
-    }
+    //public static bool KeybindIsPressed(string name)
+    //{
+    //    var key = KeybindToKey(name);
+    //    if (!key.HasValue || !Svc.KeyState.IsVirtualKeyValid((int)key)) return false;
+    //    return Svc.KeyState.GetRawValue((int)key) != 0 || IsKeyPressed((int)key);
+    //}
 
-    public static bool KeybindIsPressed(string name)
-    {
-        var key = KeybindToKey(name);
-        if (!key.HasValue || !Svc.KeyState.IsVirtualKeyValid((int)key)) return false;
-        return Svc.KeyState.GetRawValue((int)key) != 0 || IsKeyPressed((int)key);
-    }
+    //public static void ResetKeybind(string name)
+    //{
+    //    var key = KeybindToKey(name);
+    //    if (!key.HasValue || !Svc.KeyState.IsVirtualKeyValid((int)key)) return;
+    //    Svc.KeyState.SetRawValue((int)key, 0);
+    //}
 
-    public static void ResetKeybind(string name)
-    {
-        var key = KeybindToKey(name);
-        if (!key.HasValue || !Svc.KeyState.IsVirtualKeyValid((int)key)) return;
-        Svc.KeyState.SetRawValue((int)key, 0);
-    }
+    //public static unsafe VirtualKey? KeybindToKey(string name)
+    //{
+    //    VirtualKey? key = null;
+    //    var keybind = new UIInputData.Keybind();
+    //    var keyName = Utf8String.FromString(name);
+    //    var inputData = UIInputData.Instance();
+    //    inputData->GetKeybind(keyName, &keybind);
+    //    List<List<nint>?> availableKeys = [GetKeysToPress(keybind.Key, keybind.Modifier), GetKeysToPress(keybind.AltKey, keybind.AltModifier)];
+    //    var realKeys = availableKeys.Where(x => x != null).Select(x => x!).MinBy(x => x.Count);
+    //    key = (VirtualKey?)realKeys?.FirstOrDefault();
+    //    return key == null ? null : key;
+    //}
 
-    public static unsafe VirtualKey? KeybindToKey(string name)
-    {
-        VirtualKey? key = null;
-        var keybind = new FFXIVClientStructs.FFXIV.Client.System.Input.Keybind();
-        var keyName = Utf8String.FromString(name);
-        var inputData = UIInputData.Instance();
-        inputData->GetKeybindByName(keyName, &keybind);
-        List<List<nint>?> availableKeys = [GetKeysToPress(keybind.KeySettings[0].Key, keybind.KeySettings[0].KeyModifier), GetKeysToPress(keybind.KeySettings[1].Key, keybind.KeySettings[1].KeyModifier)];
-        var realKeys = availableKeys.Where(x => x != null).Select(x => x!).MinBy(x => x.Count);
-        key = (VirtualKey?)realKeys?.FirstOrDefault();
-        return key == null ? null : key;
-    }
+    //public static List<nint>? GetKeysToPress(SeVirtualKey key, ModifierFlag modifier)
+    //{
+    //    List<nint> keys = [];
+    //    if (modifier.HasFlag(ModifierFlag.Ctrl))
+    //        keys.Add(0x11); // VK_CONTROL
+    //    if (modifier.HasFlag(ModifierFlag.Shift))
+    //        keys.Add(0x10); // VK_SHIFT
+    //    if (modifier.HasFlag(ModifierFlag.Alt))
+    //        keys.Add(0x12); // VK_MENU
 
-    // porting-note(api13): UIInputData.GetKeybind(Utf8String*, Keybind*) is [Obsolete(error)]
-    // DLLSET-RECHECK(api13 official 13.0.0.16 / CS 0.0.6966): the Keybind struct shape (incl. the unset StructSize)
-    // is a CS-version fact. Re-judged 2026-07-28 on the official set: Keybind still declares
-    // _keySettings / _gamepadSettings / Unk8 / UnkA / StructSize and UIInputData still exposes GetKeybindByName --
-    // identical to the preview set despite CS moving 6716 -> 6966, so this stands.
-    // GetKeybindByName takes the newer FFXIV.Client.System.Input.Keybind,
-    // whose KeySettings[0]/[1] hold what the old struct called Key/Modifier and
-    // AltKey/AltModifier. KeyModifierFlag has the identical members as ModifierFlag.
-    // RUNTIME-VERIFY: keybind lookup still resolves on TC.
-    public static List<nint>? GetKeysToPress(SeVirtualKey key, FFXIVClientStructs.FFXIV.Client.System.Input.KeyModifierFlag modifier)
-    {
-        List<nint> keys = [];
-        if (modifier.HasFlag(FFXIVClientStructs.FFXIV.Client.System.Input.KeyModifierFlag.Ctrl))
-            keys.Add(0x11); // VK_CONTROL
-        if (modifier.HasFlag(FFXIVClientStructs.FFXIV.Client.System.Input.KeyModifierFlag.Shift))
-            keys.Add(0x10); // VK_SHIFT
-        if (modifier.HasFlag(FFXIVClientStructs.FFXIV.Client.System.Input.KeyModifierFlag.Alt))
-            keys.Add(0x12); // VK_MENU
+    //    var mappedKey = (nint)key;
+    //    if (mappedKey == 0)
+    //        return null;
 
-        var mappedKey = (nint)key;
-        if (mappedKey == 0)
-            return null;
-
-        keys.Add(mappedKey);
-        return keys;
-    }
+    //    keys.Add(mappedKey);
+    //    return keys;
+    //}
 }

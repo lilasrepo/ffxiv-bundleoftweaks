@@ -86,7 +86,7 @@ public class EnhancedLoginLogout : Tweak<EnhancedLoginLogoutConfig>
             foreach (var cmd in chr.LoginCommands.Where(c => c.Length >= 3))
             {
                 TaskManager.EnqueueDelay(250);
-                TaskManager.Enqueue(() => Chat.Instance.SendMessage(cmd));
+                TaskManager.Enqueue(() => Chat.SendMessage(cmd));
             }
     }
 }

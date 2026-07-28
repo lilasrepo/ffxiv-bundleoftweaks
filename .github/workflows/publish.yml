@@ -1,18 +1,17 @@
-name: Build & Publish to Dynamis
-
-on:
+﻿on:
   push:
     tags:
       - 'v*.*'
 
+permissions:
+  contents: read
+
 jobs:
-  Build:
+  publish:
     runs-on: ubuntu-latest
-    env:
-        DALAMUD_HOME: /tmp/dalamud
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Build and publish
+        uses: Jaksuhn/DynamisPublishAction@master
         with:
           submodules: true
 
