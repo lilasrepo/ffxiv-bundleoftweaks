@@ -1,11 +1,11 @@
-# CBT / Automaton（繁中移植版 · TC12） / Traditional-Chinese Port
+# CBT / Automaton（繁中移植版 · TC13） / Traditional-Chinese Port
 
 > 又一個調整／QoL 合集插件。<br>
 > Yet another tweaks collection plugin.
 
-**繁體中文**：這是 **[Automaton（CBT）](https://github.com/Jaksuhn/ffxiv-bundleoftweaks)** 的繁體中文客戶端移植版，對應 **FFXIV 7.1 / yanmucorp Dalamud API12（.NET 9）**。本專案僅做相容性移植，**非官方、非原作維護**；所有原始功能與設計著作權歸原作者 **croizat**。
+**繁體中文**：這是 **[Automaton（CBT）](https://github.com/Jaksuhn/ffxiv-bundleoftweaks)** 的繁體中文客戶端移植版，對應 **FFXIV 7.20 / yanmucorp Dalamud API13（.NET 9）**。本專案僅做相容性移植，**非官方、非原作維護**；所有原始功能與設計著作權歸原作者 **croizat**。
 
-**English**: A Traditional-Chinese-client port of **[Automaton (CBT)](https://github.com/Jaksuhn/ffxiv-bundleoftweaks)** targeting **FFXIV 7.1 / yanmucorp Dalamud API12 (.NET 9)**. Compatibility port only — **unofficial and not maintained by the original author**. All original work © **croizat**.
+**English**: A Traditional-Chinese-client port of **[Automaton (CBT)](https://github.com/Jaksuhn/ffxiv-bundleoftweaks)** targeting **FFXIV 7.20 / yanmucorp Dalamud API13 (.NET 9)**. Compatibility port only — **unofficial and not maintained by the original author**. All original work © **croizat**.
 
 ---
 
@@ -24,7 +24,7 @@ A collection of game tweaks and quality-of-life adjustments — some simple, som
    ```
    https://raw.githubusercontent.com/lilasrepo/DalamudPlugins/main/pluginmaster.json
    ```
-4. 輸入 `/xlplugins`，搜尋 **CBT (TC12)** → 安裝 → 啟用。
+4. 輸入 `/xlplugins`，搜尋 **CBT (TC13)** → 安裝 → 啟用。
 
 **English**
 1. Launch the Traditional-Chinese client with **XIVTCLauncher**.
@@ -33,14 +33,14 @@ A collection of game tweaks and quality-of-life adjustments — some simple, som
    ```
    https://raw.githubusercontent.com/lilasrepo/DalamudPlugins/main/pluginmaster.json
    ```
-4. Type `/xlplugins`, search **CBT (TC12)** → Install → Enable.
+4. Type `/xlplugins`, search **CBT (TC13)** → Install → Enable.
 
 ## 對應版本 / Compatibility
 
 | 項目 / Item | 版本 / Version |
 |---|---|
-| 遊戲 / Game | FFXIV 7.1（繁中客戶端 / TC client） |
-| Dalamud | yanmucorp API12（.NET 9） |
+| 遊戲 / Game | FFXIV 7.20（繁中客戶端 / TC client） |
+| Dalamud | yanmucorp API13（.NET 9） |
 | 移植自上游 / Ported from upstream | v69.75.0.0 |
 
 ## 原作與授權 / Credits & License
