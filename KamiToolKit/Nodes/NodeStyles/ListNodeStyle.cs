@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Numerics;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using KamiToolKit.Classes;
 
 namespace KamiToolKit.Nodes.NodeStyles;

@@ -4,7 +4,7 @@ using Dalamud.Interface.Components;
 using ECommons.Automation;
 using ECommons.GameFunctions;
 using ECommons.ImGuiMethods;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System.Threading.Tasks;
 
 namespace Automaton.Features;
@@ -69,7 +69,7 @@ public class GMAlert : Tweak<GMAlertConfiguration>
 
         ImGui.Checkbox("Kill Game", ref Config.KillGame);
 
-        ImGuiHelpers.SafeTextColoredWrapped(Colors.Gold, "Execute Commands");
+        ImGui.TextColoredWrapped(Colors.Gold, "Execute Commands");
         if (ImGui.InputText($"##Commands", ref _cmd, 50, ImGuiInputTextFlags.EnterReturnsTrue))
             Config.Commands.Add(_cmd.StartsWith('/') ? _cmd : $"/{_cmd}");
 

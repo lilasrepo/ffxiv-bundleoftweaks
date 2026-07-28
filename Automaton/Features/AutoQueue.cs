@@ -23,7 +23,7 @@ internal class AutoQueue : Tweak
         Svc.AddonLifecycle.UnregisterListener(OnSetupContentsFinder);
     }
 
-    private unsafe void OnSetupContentsFinder(AddonEvent type, AddonArgs args) => Callback.Fire((AtkUnitBase*)args.Addon, true, 12, 0);
+    private unsafe void OnSetupContentsFinder(AddonEvent type, AddonArgs args) => Callback.Fire((AtkUnitBase*)args.Addon.Address, true, 12, 0);
 
     private unsafe void OnTerritoryChanged(ushort obj)
     {

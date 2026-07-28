@@ -49,6 +49,18 @@ public class YamlFactory : ISerializationFactory
     public string Serialize(object s, bool prettyPrint) => new SerializerBuilder().Build().Serialize(s);
     public string? Serialize(object config) => Serialize(config, false);
     public byte[]? SerializeAsBin(object config) => Encoding.UTF8.GetBytes(Serialize(config) ?? "");
+
+    // porting-note(api13): ECommons' ISerializationFactory grew five file-IO members after
+    // the revision upstream Automaton pins, so YamlFactory no longer satisfies it. Delegate
+    // to DefaultSerializationFactory rather than reimplementing -- its WriteFile carries the
+    // write-to-.new-then-move anti-corruption dance that a plain File.WriteAllText loses.
+    private static readonly DefaultSerializationFactory FileIo = new();
+
+    public void WriteFile(string fullPath, string data) => FileIo.WriteFile(fullPath, data);
+    public void WriteFile(string fullPath, byte[] data) => FileIo.WriteFile(fullPath, data);
+    public string ReadFileAsText(string fullPath) => FileIo.ReadFileAsText(fullPath);
+    public byte[] ReadFileAsBin(string fullPath) => FileIo.ReadFileAsBin(fullPath);
+    public bool FileExists(string fullPath) => FileIo.FileExists(fullPath);
 }
 
 public interface IMigration

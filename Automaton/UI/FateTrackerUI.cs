@@ -7,7 +7,7 @@ using ECommons.ImGuiMethods;
 using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
 using FFXIVClientStructs.FFXIV.Client.Game.WKS;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace Automaton.UI;
 internal class FateTrackerUI(DateWithDestiny tweak) : Window($"Fate Tracker##{nameof(FateTrackerUI)}")
@@ -56,7 +56,7 @@ internal class FateTrackerUI(DateWithDestiny tweak) : Window($"Fate Tracker##{na
 
             if (_tweak.Config.ShowFateBonusIndicator && fate.HasBonus)
             {
-                ImGui.Image(Svc.Texture.GetFromGameIcon(new Dalamud.Interface.Textures.GameIconLookup(65001)).GetWrapOrEmpty().ImGuiHandle, new Vector2(ImGuiX.IconUnitHeight()));
+                ImGui.Image(Svc.Texture.GetFromGameIcon(new Dalamud.Interface.Textures.GameIconLookup(65001)).GetWrapOrEmpty().Handle, new Vector2(ImGuiX.IconUnitHeight()));
 
                 ImGui.SameLine();
             }

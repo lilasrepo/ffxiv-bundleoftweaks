@@ -152,7 +152,7 @@ public unsafe class Part : IDisposable {
         InternalAsset->AtkTexture.KernelTexture = Texture.CreateTexture2D(textureWrap.Width, textureWrap.Height, 3, (uint) TextureFormat.R8G8B8A8, 0, 0);
 
         cachedTexture = InternalAsset->AtkTexture.KernelTexture->D3D11ShaderResourceView;
-        InternalAsset->AtkTexture.KernelTexture->D3D11ShaderResourceView = (void*) textureWrap.ImGuiHandle;
+        InternalAsset->AtkTexture.KernelTexture->D3D11ShaderResourceView = (void*) textureWrap.Handle;
 
         InternalAsset->AtkTexture.TextureType = TextureType.KernelTexture;
 

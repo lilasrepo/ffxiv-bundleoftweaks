@@ -4,8 +4,9 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Lumina.Excel.Sheets;
+using Callback = ECommons.Automation.Callback;
 
 namespace Automaton.UI.Debug.Tabs;
 internal unsafe class ToolsTab : DebugTab

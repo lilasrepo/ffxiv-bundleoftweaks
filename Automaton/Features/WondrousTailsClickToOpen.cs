@@ -7,6 +7,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
 using System.Text.RegularExpressions;
 using static FFXIVClientStructs.FFXIV.Client.Game.UI.ContentsFinderQueueInfo.QueueStates;
+using Dalamud.Game.Addon.Events.EventDataTypes;
 
 namespace Automaton.Features;
 
@@ -34,7 +35,7 @@ internal class WondrousTailsClickToOpen : Tweak
 
     private unsafe void OnAddonSetup(AddonEvent type, AddonArgs args)
     {
-        var addonWeeklyBingo = (AddonWeeklyBingo*)args.Addon;
+        var addonWeeklyBingo = (AddonWeeklyBingo*)args.Addon.Address;
         ResetEventHandles();
         foreach (var index in Enumerable.Range(0, 16))
         {
@@ -85,9 +86,12 @@ internal class WondrousTailsClickToOpen : Tweak
 
     private void OnAddonFinalize(AddonEvent type, AddonArgs args) => ResetEventHandles();
 
-    private unsafe void OnDutySlotClick(AddonEventType atkEventType, nint atkUnitBase, nint atkResNode)
+    // porting-note(api13): IAddonEventManager.AddonEventDelegate collapsed its
+    // (type, addon, node) parameters into a single AddonEventData, which still carries
+    // both pointers -- so this is a lossless reshape, not a downgrade.
+    private unsafe void OnDutySlotClick(AddonEventType atkEventType, AddonEventData data)
     {
-        var dutyButtonNode = (AtkResNode*)atkResNode;
+        var dutyButtonNode = (AtkResNode*)data.NodeTargetPointer;
         var tileIndex = (int)dutyButtonNode->NodeId - 12;
         var selectedTask = PlayerState.Instance()->GetWeeklyBingoTaskStatus(tileIndex);
         var bingoData = PlayerState.Instance()->WeeklyBingoOrderData[tileIndex];

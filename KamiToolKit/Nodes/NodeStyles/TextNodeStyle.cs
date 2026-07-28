@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Numerics;
 using Dalamud.Interface;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using KamiToolKit.Classes;
 
 namespace KamiToolKit.Nodes.NodeStyles;

@@ -7,7 +7,7 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.Interop;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace Automaton.Utilities;
 public static class Utils
@@ -81,24 +81,33 @@ public static class Utils
     public static unsafe VirtualKey? KeybindToKey(string name)
     {
         VirtualKey? key = null;
-        var keybind = new UIInputData.Keybind();
+        var keybind = new FFXIVClientStructs.FFXIV.Client.System.Input.Keybind();
         var keyName = Utf8String.FromString(name);
         var inputData = UIInputData.Instance();
-        inputData->GetKeybind(keyName, &keybind);
-        List<List<nint>?> availableKeys = [GetKeysToPress(keybind.Key, keybind.Modifier), GetKeysToPress(keybind.AltKey, keybind.AltModifier)];
+        inputData->GetKeybindByName(keyName, &keybind);
+        List<List<nint>?> availableKeys = [GetKeysToPress(keybind.KeySettings[0].Key, keybind.KeySettings[0].KeyModifier), GetKeysToPress(keybind.KeySettings[1].Key, keybind.KeySettings[1].KeyModifier)];
         var realKeys = availableKeys.Where(x => x != null).Select(x => x!).MinBy(x => x.Count);
         key = (VirtualKey?)realKeys?.FirstOrDefault();
         return key == null ? null : key;
     }
 
-    public static List<nint>? GetKeysToPress(SeVirtualKey key, ModifierFlag modifier)
+    // porting-note(api13): UIInputData.GetKeybind(Utf8String*, Keybind*) is [Obsolete(error)]
+    // DLLSET-RECHECK(api13 official 13.0.0.16 / CS 0.0.6966): the Keybind struct shape (incl. the unset StructSize)
+    // is a CS-version fact. Re-judged 2026-07-28 on the official set: Keybind still declares
+    // _keySettings / _gamepadSettings / Unk8 / UnkA / StructSize and UIInputData still exposes GetKeybindByName --
+    // identical to the preview set despite CS moving 6716 -> 6966, so this stands.
+    // GetKeybindByName takes the newer FFXIV.Client.System.Input.Keybind,
+    // whose KeySettings[0]/[1] hold what the old struct called Key/Modifier and
+    // AltKey/AltModifier. KeyModifierFlag has the identical members as ModifierFlag.
+    // RUNTIME-VERIFY: keybind lookup still resolves on TC.
+    public static List<nint>? GetKeysToPress(SeVirtualKey key, FFXIVClientStructs.FFXIV.Client.System.Input.KeyModifierFlag modifier)
     {
         List<nint> keys = [];
-        if (modifier.HasFlag(ModifierFlag.Ctrl))
+        if (modifier.HasFlag(FFXIVClientStructs.FFXIV.Client.System.Input.KeyModifierFlag.Ctrl))
             keys.Add(0x11); // VK_CONTROL
-        if (modifier.HasFlag(ModifierFlag.Shift))
+        if (modifier.HasFlag(FFXIVClientStructs.FFXIV.Client.System.Input.KeyModifierFlag.Shift))
             keys.Add(0x10); // VK_SHIFT
-        if (modifier.HasFlag(ModifierFlag.Alt))
+        if (modifier.HasFlag(FFXIVClientStructs.FFXIV.Client.System.Input.KeyModifierFlag.Alt))
             keys.Add(0x12); // VK_MENU
 
         var mappedKey = (nint)key;

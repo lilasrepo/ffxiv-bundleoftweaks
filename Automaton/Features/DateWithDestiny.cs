@@ -8,7 +8,7 @@ using ECommons.SimpleGui;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Fate;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Lumina.Excel.Sheets;
 using static ECommons.GameFunctions.ObjectFunctions;
 
@@ -385,7 +385,7 @@ public class DateWithDestiny : Tweak<DateWithDestinyConfiguration>
 
     private unsafe void SyncFate(ushort value)
     {
-        if (value != 0 && PlayerState.Instance()->IsLevelSynced == 0)
+        if (value != 0 && !PlayerState.Instance()->IsLevelSynced)
         {
             if (Player.Level > fateMaxLevel)
                 ECommons.Automation.Chat.Instance.SendMessage("/lsync");

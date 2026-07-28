@@ -2,7 +2,7 @@
 using Dalamud.Interface.Components;
 using ECommons.Automation;
 using ECommons.Events;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace Automaton.Features;
 public class EnhancedLoginLogoutConfig
