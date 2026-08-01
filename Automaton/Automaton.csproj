@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Authors>croizat</Authors>
-        <Version>69.75.0.4</Version>
+        <Version>69.75.0.5</Version>
     </PropertyGroup>
 
     <PropertyGroup>

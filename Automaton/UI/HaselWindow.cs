@@ -139,7 +139,7 @@ public partial class HaselWindow : Window
 
             // links, bottom left
             ImGui.SetCursorPos(cursorPos + new Vector2(0, contentAvail.Y - ImGui.GetTextLineHeight()));
-            ImGuiX.DrawLink("GitHub", "GitHub", "https://github.com/Jaksuhn/Automaton");
+            ImGuiX.DrawLink("GitHub", "GitHub", "https://github.com/lilasrepo/ffxiv-bundleoftweaks");
             ImGui.SameLine();
             ImGui.TextUnformatted("•");
             ImGui.SameLine();
